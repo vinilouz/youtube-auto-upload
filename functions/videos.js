@@ -12,8 +12,7 @@ function createVideoObject(filename) {
   const day = String(today.getDate()).padStart(2, '0');
   return {
     filename,
-    scheduleDate: `${day}/${month}/${year}`,
-    privacy: 'UNLISTED'
+    scheduleDate: `${day}/${month}/${year}`
   };
 }
 

@@ -29,6 +29,11 @@ async function uploadVideo(page, videoConfig, filePath) {
   await uploadInput.setInputFiles(filePath);
   await randomPause();
 
+  // Get videoUrl
+  const videoUrlSelector = '.ytcp-video-metadata-editor-sidepanel .ytcp-video-info > .ytcp-video-info > .ytcp-video-info > .ytcp-video-info.video-url-fadeable > a.ytcp-video-info';
+  await page.waitForSelector(videoUrlSelector, { visible: true });
+  const videoUrl = await page.$eval(videoUrlSelector, el => el.href);
+
   if (videoConfig.title) {
     await page.click('#basics.ytcp-video-metadata-editor #title-wrapper #textbox');
     await page.keyboard.press('Control+A');
@@ -42,7 +47,43 @@ async function uploadVideo(page, videoConfig, filePath) {
     await randomPause();
   }
 
+  // IS FOR KIDS?
+  await page.waitForSelector('#audience > ytkc-made-for-kids-select > div.made-for-kids-rating-container.ytkc-made-for-kids-select .made-for-kids-group', { visible: true });
+  if (videoConfig.kids === true) {
+    await page.click('[name="VIDEO_MADE_FOR_KIDS_MFK"]');
+  } else {
+    await page.click('[name="VIDEO_MADE_FOR_KIDS_NOT_MFK"]');
+  }
+  await randomPause();
+
+  // Abrir botão de mais opções
+  await page.click('#toggle-button > ytcp-button-shape > button[aria-label="Show more"]');
+  await randomPause();
+
+  // TAGS
+  if (videoConfig.tags && Array.isArray(videoConfig.tags)) {
+    await page.waitForSelector('#chip-bar #text-input', { visible: true });
+    for (const tag of videoConfig.tags) {
+      await page.click('#chip-bar #text-input');
+      await page.keyboard.type(tag);
+      await page.keyboard.press('Enter');
+      await randomPause();
+    }
+  }
+
+  // ALERT SUBS
+  await page.waitForSelector('#notify-subscribers', { visible: true });
+  const notifySubscribersCheckbox = await page.$('#notify-subscribers');
+  const isChecked = await notifySubscribersCheckbox.evaluate(el => el.getAttribute('aria-checked') === 'true');
+  if (videoConfig.alertSubs === true && !isChecked) {
+    await notifySubscribersCheckbox.click();
+  } else if (videoConfig.alertSubs !== true && isChecked) {
+    await notifySubscribersCheckbox.click();
+  }
+  await randomPause();
+
   for (let i = 0; i < 3; i++) {
+    // Checar a visibilidade do botão "#next-button > ytcp-button-shape > button" antes de fazer varios cliques
     await page.click('#next-button > ytcp-button-shape > button');
     await randomPause();
   }
@@ -52,6 +93,7 @@ async function uploadVideo(page, videoConfig, filePath) {
   await randomPause();
 
   if (videoConfig.scheduleDate) {
+    await page.waitForSelector('#second-container-expand-button', { visible: true });
     await page.click('#second-container-expand-button');
     await randomPause();
 
@@ -60,12 +102,17 @@ async function uploadVideo(page, videoConfig, filePath) {
     const youtubeDate = `${meses[parseInt(mes) - 1]} ${dia}, ${ano}`;
 
     await page.click('tp-yt-iron-icon#right-icon');
+    await randomPause();
     await page.fill('#control-area .ytcp-date-picker input', youtubeDate);
     await page.press('#control-area .ytcp-date-picker input', 'Enter');
     await randomPause();
   }
 
   if (videoConfig.scheduleTime) {
+    await page.waitForSelector('#second-container-expand-button', { visible: true });
+    await page.click('#second-container-expand-button');
+    await randomPause();
+
     await page.fill('#time-of-day-container input', videoConfig.scheduleTime);
     await randomPause();
   }
@@ -75,6 +122,8 @@ async function uploadVideo(page, videoConfig, filePath) {
 
   await page.click('#close-button button[aria-label="Close"]');
   await randomPause();
+
+  return videoUrl;
 }
 
 (async () => {
@@ -104,7 +153,7 @@ async function uploadVideo(page, videoConfig, filePath) {
 
   const context = await chromium.launchPersistentContext(userDataDir, {
     headless: false,
-    viewport: { width: 1280, height: 800 },
+    viewport: { width: 1280, height: 720 },
     userAgent: await getLatestUserAgent(),
     locale: 'pt-BR',
     isMobile: false,
@@ -125,8 +174,9 @@ async function uploadVideo(page, videoConfig, filePath) {
   const page = await context.newPage();
 
   for (const videoConfig of configData) {
+    const videoFileName = path.parse(videoConfig.filename).name;
     const videoFiles = fs.readdirSync(videosDir).filter(file =>
-      path.parse(file).name === videoConfig.filename
+      path.parse(file).name === videoFileName
     );
 
     if (videoFiles.length === 0) {
@@ -137,8 +187,12 @@ async function uploadVideo(page, videoConfig, filePath) {
     const filePath = path.join(videosDir, videoFiles[0]);
 
     try {
-      await uploadVideo(page, videoConfig, filePath);
-      console.log(color(`Vídeo ${videoConfig.filename} enviado com sucesso para a conta `, 32) + color(selectedAccount.name, 35));
+      const videoUrl = await uploadVideo(page, videoConfig, filePath);
+      console.log(
+        color(`Vídeo ${videoConfig.filename} enviado com sucesso para a conta `, 32) +
+        color(selectedAccount.name, 35) +
+        color(` ${videoUrl}`, 36)
+      );
     } catch (error) {
       console.error(color(`Erro ao enviar o vídeo ${videoConfig.filename} para a conta ${selectedAccount.name}:`, 31), error);
     }

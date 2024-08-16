@@ -4,11 +4,12 @@ const config = require('../config');
 const slugify = require('slugify');
 const { chromium } = require('playwright');
 const { getLatestUserAgent, randomPause, color, rootPath } = require('./utils');
+const targetUrl = 'https://www.youtube.com/account';
 
 async function loginAccount(account, userDataDir) {
   const context = await chromium.launchPersistentContext(userDataDir, {
     headless: false,
-    viewport: { width: 1280, height: 800 },
+    viewport: { width: 1280, height: 720 },
     userAgent: await getLatestUserAgent(),
     locale: 'pt-BR',
     isMobile: false,
@@ -28,7 +29,7 @@ async function loginAccount(account, userDataDir) {
 
   const page = await context.newPage();
 
-  await page.goto('https://www.youtube.com/account');
+  await page.goto(targetUrl);
 
   await randomPause();
 
@@ -57,13 +58,14 @@ async function loginAccount(account, userDataDir) {
   await randomPause();
 
 
-  // Aguarde até que a página navegue para a URL desejada
-  await page.waitForURL('https://www.youtube.com/account', async function success() {
+  await page.waitForURL(targetUrl);
+
+  if (page.url() === targetUrl) {
     console.log(color('🎉 Login realizado com sucesso para a conta ', 32) + color(account.name, 35));
     await context.storageState({ path: path.join(userDataDir, 'sessionState.json') });
-  }, function fail() {
+  } else {
     console.error('Não foi possível encontrar a página de sucesso.');
-  });
+  }
 
   await context.close();
 }

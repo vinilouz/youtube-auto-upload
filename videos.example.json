@@ -3,8 +3,14 @@
     "filename": "lorem_ipsum",
     "title": "Título do Vídeo 1",
     "description": "Descrição detalhada do vídeo 1.",
-    "scheduleDate": "15/08/2024", 
+    "scheduleDate": "15/08/2024",
     "scheduleTime": "03:00 PM",
-    "privacy": "UNLISTED"
+    "privacy": "UNLISTED",
+    "tags": [
+      "tag1",
+      "tag2"
+    ],
+    "alertSubs": true,
+    "kids": false
   }
 ]

@@ -133,3 +133,4 @@ dist
 videos_all/
 config.js
 /user-data-*
+videos.json
