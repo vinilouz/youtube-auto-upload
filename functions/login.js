@@ -36,7 +36,7 @@ async function loginAccount(account, userDataDir) {
   await emailField.hover();
   await emailField.click();
   await randomPause();
-  await emailField.fill(process.env.EMAIL);
+  await emailField.fill(account.email);
   await randomPause();
 
   const submitButtonEmail = page.locator('#identifierNext button[jsaction]');
@@ -48,7 +48,7 @@ async function loginAccount(account, userDataDir) {
   await passField.hover();
   await passField.click();
   await randomPause();
-  await passField.fill(process.env.PASSWORD);
+  await passField.fill(account.password);
   await randomPause();
 
   const submitButtonPass = page.locator('#passwordNext button[jsaction]');
