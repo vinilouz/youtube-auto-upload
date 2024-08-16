@@ -90,10 +90,6 @@ module.exports = {
 - Videos should be placed in a `videos/` directory in the project root
 - Run `npm run videos` after adding new videos to the `videos/` directory to update `videos.json`
 
-## In Development
-- Fixed first comment
-- Multi channel, same account
-
 ## License
 This project is licensed under the ISC License.
 
