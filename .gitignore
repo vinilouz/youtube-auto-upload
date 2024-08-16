@@ -130,5 +130,6 @@ dist
 .pnp.*
 
 #custom
-./my-session
-meta.json
+videos_all/
+config.js
+/user-data-*

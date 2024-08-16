@@ -91,3 +91,8 @@ This project is for educational and automation purposes. Use it responsibly and 
 
 
 **This updated README includes the `package.json` information and provides a clear overview of the project's features and usage.**
+
+// next steps: 
+- update readme 
+- tags 
+- multi channel
