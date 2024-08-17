@@ -128,7 +128,7 @@ async function uploadVideo(page, videoConfig, filePath) {
   await page.click('#done-button[role="button"]');
   await randomPause();
 
-  await page.click('#close-button button[aria-label="Close"]');
+  await page.click('#close-button button[aria-label]');
   await randomPause();
 
   /* SE tiver attr comments NAO executar o schedule e NÃO usar o privacy selecionado, sempre como UNLISTED
