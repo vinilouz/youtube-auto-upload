@@ -4,6 +4,7 @@ const fs = require('fs');
 const config = require('../config');
 const slugify = require('slugify');
 const yargs = require('yargs/yargs');
+const { format, parse } = require('date-fns');
 const { hideBin } = require('yargs/helpers');
 const { getLatestUserAgent, randomPause, color, rootPath } = require('./utils');
 
@@ -97,9 +98,14 @@ async function uploadVideo(page, videoConfig, filePath) {
     await page.click('#second-container-expand-button');
     await randomPause();
 
-    const [dia, mes, ano] = videoConfig.scheduleDate.split('/');
-    const meses = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const youtubeDate = `${meses[parseInt(mes) - 1]} ${dia}, ${ano}`;
+    const inputDateValue = document.querySelector('.ytcp-date-picker input').value;
+    const youtubeDate = format(
+      parse(videoConfig.scheduleDate, 'dd/MM/yyyy', new Date()),
+      /[a-zA-Z]/.test(inputDateValue) ?
+        (inputDateValue.includes('de') ? "d 'de' MMM 'de' yyyy" : 'MMM d, yyyy') :
+        'dd/MM/yyyy',
+      { locale: ptBR }
+    );
 
     await page.click('tp-yt-iron-icon#right-icon');
     await randomPause();
@@ -151,6 +157,7 @@ async function uploadVideo(page, videoConfig, filePath) {
   // #select-button > tp-yt-iron-icon
   // Click on (open Schedule select):
   // #second-container-expand-button > tp-yt-iron-icon
+  // Aplicar função generica
 
   // IF DATE = Click on (open date select):
   // #datepicker-trigger #right-icon
