@@ -57,6 +57,7 @@ async function uploadVideo(page, videoConfig, filePath) {
   }
   await randomPause();
 
+
   // Abrir botão de mais opções
   await page.click('#toggle-button > ytcp-button-shape > button[aria-label]');
   await randomPause();
@@ -98,17 +99,17 @@ async function uploadVideo(page, videoConfig, filePath) {
     await page.click('#second-container-expand-button');
     await randomPause();
 
-    const inputDateValue = document.querySelector('.ytcp-date-picker input').value;
+    await page.click('tp-yt-iron-icon#right-icon');
+    await randomPause();
+
+    const inputDateValue = await page.$eval('.ytcp-date-picker input', el => el.value);
     const youtubeDate = format(
       parse(videoConfig.scheduleDate, 'dd/MM/yyyy', new Date()),
       /[a-zA-Z]/.test(inputDateValue) ?
         (inputDateValue.includes('de') ? "d 'de' MMM 'de' yyyy" : 'MMM d, yyyy') :
-        'dd/MM/yyyy',
-      { locale: ptBR }
+        'dd/MM/yyyy'
     );
 
-    await page.click('tp-yt-iron-icon#right-icon');
-    await randomPause();
     await page.fill('#control-area .ytcp-date-picker input', youtubeDate);
     await page.press('#control-area .ytcp-date-picker input', 'Enter');
     await randomPause();
