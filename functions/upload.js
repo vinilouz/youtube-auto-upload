@@ -5,7 +5,7 @@ const config = require('../config');
 const slugify = require('slugify');
 const yargs = require('yargs/yargs');
 const { format, parse } = require('date-fns');
-const { ptBR } = require('date-fns/locale'); 
+const { ptBR } = require('date-fns/locale');
 const { hideBin } = require('yargs/helpers');
 const { getLatestUserAgent, randomPause, color, rootPath } = require('./utils');
 
@@ -107,9 +107,8 @@ async function uploadVideo(page, videoConfig, filePath) {
     const youtubeDate = format(
       parse(videoConfig.scheduleDate, 'dd/MM/yyyy', new Date()),
       /[a-zA-Z]/.test(inputDateValue) ?
-        (inputDateValue.includes('de') ? "d 'de' MMM 'de' yyyy" : 'MMM d, yyyy') :
-        'dd/MM/yyyy',
-      { locale: ptBR }
+        (inputDateValue.includes('de') ? "d 'de' MMM. 'de' yyyy" : 'MMM d, yyyy') :
+        'dd/MM/yyyy', { locale: ptBR }
     );
 
     await page.fill('#control-area .ytcp-date-picker input', youtubeDate);
