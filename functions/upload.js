@@ -57,7 +57,7 @@ async function uploadVideo(page, videoConfig, filePath) {
   await randomPause();
 
   // Abrir botão de mais opções
-  await page.click('#toggle-button > ytcp-button-shape > button[aria-label="Show more"]');
+  await page.click('#toggle-button > ytcp-button-shape > button[aria-label]');
   await randomPause();
 
   // TAGS
@@ -88,7 +88,7 @@ async function uploadVideo(page, videoConfig, filePath) {
     await randomPause();
   }
 
-  const privacyOption = videoConfig.privacy || "PRIVATE";
+  const privacyOption = videoConfig.privacy || "UNLISTED";
   await page.click(`tp-yt-paper-radio-button[name="${privacyOption}"]`);
   await randomPause();
 
@@ -123,6 +123,48 @@ async function uploadVideo(page, videoConfig, filePath) {
   await page.click('#close-button button[aria-label="Close"]');
   await randomPause();
 
+  /* SE tiver attr comments NAO executar o schedule e NÃO usar o privacy selecionado, sempre como UNLISTED
+     Executar fluxo do comment
+     Após executar schedule */
+
+  // Comments
+  // Go to video Url
+  // Click on first (open comments):
+  // #comments-button > ytd-button-renderer > yt-button-shape > label > button > yt-touch-feedback-shape > div > div.yt-spec-touch-feedback-shape__fill
+  // Click input comment:
+  // #contenteditable-root
+  // Fill content
+  // Post comment
+  // #submit-button > yt-button-shape > button
+  // Click on:
+  // #watch-while-engagement-panel #action-menu #top-level-buttons-computed + #flexible-item-buttons + .dropdown-trigger.style-scope.ytd-menu-renderer > button
+  // Click on:
+  // #items > ytd-menu-navigation-item-renderer.style-scope.ytd-menu-popup-renderer.iron-selected
+  // Close tab video url
+
+  // Re agendar pos comment
+  // Go to:
+  // `https://studio.youtube.com/video/${videoID}/edit`
+
+  // IF DATE OU DATEIME
+  // click on (Open Select):
+  // #select-button > tp-yt-iron-icon
+  // Click on (open Schedule select):
+  // #second-container-expand-button > tp-yt-iron-icon
+
+  // IF DATE = Click on (open date select):
+  // #datepicker-trigger #right-icon
+  // find and fill:
+  // .ytcp-date-picker #textbox input
+  // keypres enter
+
+  // IF TIME = Click on: 
+  // #time-of-day-container input
+
+  // Click on:
+  // #save-button button
+  // Close tab
+
   return videoUrl;
 }
 
@@ -153,7 +195,7 @@ async function uploadVideo(page, videoConfig, filePath) {
 
   const context = await chromium.launchPersistentContext(userDataDir, {
     headless: false,
-    viewport: { width: 1280, height: 720 },
+    viewport: { width: 1152, height: 648 },
     userAgent: await getLatestUserAgent(),
     locale: 'pt-BR',
     isMobile: false,

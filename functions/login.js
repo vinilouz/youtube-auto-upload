@@ -9,7 +9,7 @@ const targetUrl = 'https://www.youtube.com/account';
 async function loginAccount(account, userDataDir) {
   const context = await chromium.launchPersistentContext(userDataDir, {
     headless: false,
-    viewport: { width: 1280, height: 720 },
+    viewport: { width: 1152, height: 648 },
     userAgent: await getLatestUserAgent(),
     locale: 'pt-BR',
     isMobile: false,

@@ -76,9 +76,9 @@ module.exports = {
     "description": "Video description.", // Optional
     "scheduleDate": "DD/MM/YYYY", // Optional
     "scheduleTime": "HH:MM AM/PM", // Optional
-    "privacy": "PRIVATE", // Optional: PRIVATE (default) | UNLISTED | PUBLIC
+    "privacy": "PRIVATE", // Optional: UNLISTED (default) | PRIVATE | PUBLIC
     "tags": ["tag1", "tag2"], // Optional
-    "alertSubs": true, // Optional: true (default) | false
+    "alertSubs": true, // Optional: false (default) | true
     "kids": false  // Optional: false (default) | true
   }
 ]
