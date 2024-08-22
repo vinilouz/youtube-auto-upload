@@ -42,7 +42,6 @@ async function manualLogin(account) {
   console.log(color('🎉 Sessão salva para a conta ', 32) + color(account.name, 35));
 
   await context.close();
-  process.exit();
   return;
 }
 
@@ -50,4 +49,5 @@ async function manualLogin(account) {
   for (const account of config.accounts) {
     await manualLogin(account);
   }
+  process.exit();
 })();
