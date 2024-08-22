@@ -92,6 +92,8 @@ module.exports = {
 
 ## In Development
 - Fixed first comment
+- Playlist
+- Game Settings
 - Multi channel, same account
 
 ## License

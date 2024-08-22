@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de JSON para Vídeos</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col rounded border mb-4" style="background:#e4e4e4; ">
+        <h1 class="my-3">Gerador de JSON para Vídeos</h1>
+        <form id="videoForm" class="py-3">
+          <div class="mb-3">
+            <label for="videoFiles" class="form-label">Selecione os arquivos de vídeo:</label>
+            <input type="file" class="form-control" id="videoFiles" multiple accept="video/*" required>
+          </div>
+          <div class="mb-3">
+            <label for="title" class="form-label">Título (para todos os vídeos):</label>
+            <input type="text" class="form-control" id="title" required>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Descrição (para todos os vídeos):</label>
+            <textarea class="form-control" id="description" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="tags" class="form-label">Tags (separadas por vírgula, para todos os vídeos):</label>
+            <input type="text" class="form-control" id="tags" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Gerar JSON</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="index.js"></script>
+</body>
+
+</html>
