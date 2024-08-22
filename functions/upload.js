@@ -83,10 +83,9 @@ async function uploadVideo(page, videoConfig, filePath) {
   }
 
   if (videoConfig.description) {
-    const descriptionInput = "#basics.ytcp-video-metadata-editor #description-textarea #child-input";
-    await page.click(descriptionInput);
+    await page.click("#basics.ytcp-video-metadata-editor #description-textarea #textbox");
     await page.keyboard.press('Control+A');
-    await page.fill(descriptionInput, videoConfig.description);
+    await page.keyboard.type(videoConfig.description);
 
     await randomPause();
   }
