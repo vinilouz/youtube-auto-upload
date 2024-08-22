@@ -20,15 +20,23 @@
           </div>
           <div class="mb-3">
             <label for="title" class="form-label">Título (para todos os vídeos):</label>
-            <input type="text" class="form-control" id="title" required>
+            <input type="text" class="form-control" id="title" maxlength="100">
           </div>
           <div class="mb-3">
             <label for="description" class="form-label">Descrição (para todos os vídeos):</label>
-            <textarea class="form-control" id="description" rows="3"></textarea>
+            <textarea class="form-control" id="description" rows="3" maxlength="5000"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="playlist" class="form-label">Playlist (para todos os vídeos):</label>
+            <input type="text" class="form-control" id="playlist" maxlength="100">
+          </div>
+          <div class="mb-3">
+            <label for="gaming" class="form-label">Jogo (para todos os vídeos):</label>
+            <input type="text" class="form-control" id="gaming" maxlength="100">
           </div>
           <div class="mb-3">
             <label for="tags" class="form-label">Tags (separadas por vírgula, para todos os vídeos):</label>
-            <input type="text" class="form-control" id="tags" required>
+            <input type="text" class="form-control" id="tags" maxlength="500">
           </div>
           <button type="submit" class="btn btn-primary">Gerar JSON</button>
         </form>

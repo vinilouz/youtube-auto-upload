@@ -15,7 +15,46 @@ const argv = yargs(hideBin(process.argv))
     type: 'string',
     description: 'Nome da conta a ser usada'
   })
+  .option('headless', {
+    alias: 'h',
+    type: 'boolean',
+    default: false,
+    description: 'Executar o navegador em modo headless (sem interface gráfica)'
+  })
   .argv;
+
+function similarity(s1, s2) {
+  const longer = s1.length > s2.length ? s1 : s2;
+  const shorter = s1.length > s2.length ? s2 : s1;
+  const longerLength = longer.length;
+  if (longerLength === 0) {
+    return 1.0;
+  }
+  return (longerLength - editDistance(longer.toLowerCase(), shorter.toLowerCase())) / parseFloat(longerLength);
+}
+
+function editDistance(s1, s2) {
+  const costs = [];
+  for (let i = 0; i <= s1.length; i++) {
+    let lastValue = i;
+    for (let j = 0; j <= s2.length; j++) {
+      if (i === 0) {
+        costs[j] = j;
+      } else if (j > 0) {
+        let newValue = costs[j - 1];
+        if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
+          newValue = Math.min(newValue, lastValue, costs[j]) + 1;
+        }
+        costs[j - 1] = lastValue;
+        lastValue = newValue;
+      }
+    }
+    if (i > 0) {
+      costs[s2.length] = lastValue;
+    }
+  }
+  return costs[s2.length];
+}
 
 async function uploadVideo(page, videoConfig, filePath) {
   await page.goto('https://studio.youtube.com/');
@@ -44,10 +83,38 @@ async function uploadVideo(page, videoConfig, filePath) {
   }
 
   if (videoConfig.description) {
-    await page.click('#basics.ytcp-video-metadata-editor #description-textarea #child-input');
-    await page.keyboard.type(videoConfig.description);
+    const descriptionInput = "#basics.ytcp-video-metadata-editor #description-textarea #child-input";
+    await page.click(descriptionInput);
+    await page.keyboard.press('Control+A');
+    await page.fill(descriptionInput, videoConfig.description);
+
     await randomPause();
   }
+
+  if (videoConfig.playlist) {
+    await page.click('#scrollable-content .ytcp-video-metadata-editor-basics .dropdown-trigger-text');
+    await page.waitForSelector('#items .ytcp-checkbox-group .ytcp-checkbox-group .checkbox-label');
+
+    const labels = await page.$$('#items .ytcp-checkbox-group .ytcp-checkbox-group .checkbox-label');
+    let bestMatch = null;
+    let bestScore = 0;
+
+    for (const label of labels) {
+      const text = await label.textContent();
+      const score = similarity(text, videoConfig.playlist);
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = label;
+      }
+    }
+
+    if (bestMatch) {
+      await bestMatch.click();
+    }
+
+    await page.click('#dialog > div.action-buttons.style-scope.ytcp-playlist-dialog > ytcp-button.done-button.action-button.style-scope.ytcp-playlist-dialog > ytcp-button-shape > button');
+  }
+  await randomPause();
 
   // IS FOR KIDS?
   await page.waitForSelector('#audience > ytkc-made-for-kids-select > div.made-for-kids-rating-container.ytkc-made-for-kids-select .made-for-kids-group', { visible: true });
@@ -66,12 +133,9 @@ async function uploadVideo(page, videoConfig, filePath) {
   // TAGS
   if (videoConfig.tags && Array.isArray(videoConfig.tags)) {
     await page.waitForSelector('#chip-bar #text-input', { visible: true });
-    for (const tag of videoConfig.tags) {
-      await page.click('#chip-bar #text-input');
-      await page.keyboard.type(tag);
-      await page.keyboard.press('Enter');
-      await randomPause();
-    }
+    const tagsString = videoConfig.tags.join(', ');
+    await page.fill('#chip-bar #text-input', tagsString);
+    await randomPause();
   }
 
   // ALERT SUBS
@@ -82,6 +146,16 @@ async function uploadVideo(page, videoConfig, filePath) {
     await notifySubscribersCheckbox.click();
   } else if (videoConfig.alertSubs !== true && isChecked) {
     await notifySubscribersCheckbox.click();
+  }
+  await randomPause();
+
+  if (videoConfig.gaming) {
+    const gamingInput = await page.$('#category-container > ytcp-form-gaming > ytcp-form-autocomplete > ytcp-dropdown-trigger > div > div.left-container.style-scope.ytcp-dropdown-trigger > input');
+    await randomPause();
+    if (gamingInput) {
+      await gamingInput.fill(videoConfig.gaming);
+      await gamingInput.press('Enter');
+    }
   }
   await randomPause();
 
@@ -203,7 +277,7 @@ async function uploadVideo(page, videoConfig, filePath) {
   }
 
   const context = await chromium.launchPersistentContext(userDataDir, {
-    headless: false,
+    headless: argv.headless,
     viewport: { width: 1152, height: 648 },
     userAgent: await getLatestUserAgent(),
     locale: 'pt-BR',
