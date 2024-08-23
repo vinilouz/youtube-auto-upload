@@ -8,6 +8,7 @@ const { format, parse } = require('date-fns');
 const { ptBR } = require('date-fns/locale');
 const { hideBin } = require('yargs/helpers');
 const { getLatestUserAgent, randomPause, color, rootPath } = require('./utils');
+const clipboardy = require('clipboardy');
 
 const argv = yargs(hideBin(process.argv))
   .option('name', {
@@ -83,9 +84,11 @@ async function uploadVideo(page, videoConfig, filePath) {
   }
 
   if (videoConfig.description) {
+    clipboardy.writeSync(videoConfig.description);
     await page.click("#basics.ytcp-video-metadata-editor #description-textarea #textbox");
     await page.keyboard.press('Control+A');
-    await page.keyboard.type(videoConfig.description);
+    await randomPause();
+    await page.keyboard.press('Control+V');
 
     await randomPause();
   }
@@ -151,15 +154,27 @@ async function uploadVideo(page, videoConfig, filePath) {
   if (videoConfig.gaming) {
     const gamingInput = await page.$('#category-container > ytcp-form-gaming > ytcp-form-autocomplete > ytcp-dropdown-trigger > div > div.left-container.style-scope.ytcp-dropdown-trigger > input');
     await randomPause();
+
     if (gamingInput) {
       await gamingInput.fill(videoConfig.gaming);
-      await gamingInput.press('Enter');
+      await randomPause();
+      const searchResultItem = await page.$('#search-results #paper-list #text-item-2');
+      if (searchResultItem) {
+        await searchResultItem.click();
+      }
+    } else {
+      console.warn('O campo gamingInput não foi encontrado.');
     }
   }
   await randomPause();
 
+  const uploading = '#dialog > div > ytcp-animatable.button-area.metadata-fade-in-section.style-scope.ytcp-uploads-dialog > div > div.left-button-area.style-scope.ytcp-uploads-dialog > ytcp-video-upload-progress';
+  await page.waitForFunction(selector => {
+    const element = document.querySelector(selector);
+    return !element.hasAttribute('uploading');
+  }, uploading);
+
   for (let i = 0; i < 3; i++) {
-    // Checar a visibilidade do botão "#next-button > ytcp-button-shape > button" antes de fazer varios cliques
     await page.click('#next-button > ytcp-button-shape > button');
     await randomPause();
   }
