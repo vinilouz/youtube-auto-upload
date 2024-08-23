@@ -8,7 +8,6 @@ const { format, parse } = require('date-fns');
 const { ptBR } = require('date-fns/locale');
 const { hideBin } = require('yargs/helpers');
 const { getLatestUserAgent, randomPause, color, rootPath } = require('./utils');
-const clipboardy = require('clipboardy');
 
 const argv = yargs(hideBin(process.argv))
   .option('name', {
@@ -58,6 +57,8 @@ function editDistance(s1, s2) {
 }
 
 async function uploadVideo(page, videoConfig, filePath) {
+  const clipboardy = await import('clipboardy');
+
   await page.goto('https://studio.youtube.com/');
   await randomPause();
 
@@ -84,7 +85,7 @@ async function uploadVideo(page, videoConfig, filePath) {
   }
 
   if (videoConfig.description) {
-    clipboardy.writeSync(videoConfig.description);
+    clipboardy.default.writeSync(videoConfig.description);
     await page.click("#basics.ytcp-video-metadata-editor #description-textarea #textbox");
     await page.keyboard.press('Control+A');
     await randomPause();
