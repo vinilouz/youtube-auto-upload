@@ -7,6 +7,7 @@ document.getElementById('videoForm').addEventListener('submit', function (e) {
   const gaming = document.getElementById('gaming').value;
   const description = document.getElementById('description').value;
   const tags = document.getElementById('tags').value.split(',').map(tag => tag.trim());
+  const comments = document.getElementById('comments').value;
 
   function createVideoObject(filename, index) {
     const today = new Date();
@@ -21,7 +22,8 @@ document.getElementById('videoForm').addEventListener('submit', function (e) {
       playlist,
       gaming,
       description,
-      tags
+      tags,
+      comments
     };
   }
 
